@@ -7,9 +7,9 @@ namespace qr.Commands;
 
 public static class EncodeTextCommand
 {
-    public static RootCommand Create()
+    public static Command Create()
     {
-        var rootCommand = new RootCommand("Create QR code. SVG output will be printed to stdout.");
+        var rootCommand = new Command("text","Encode text to QR code. SVG output will be printed to stdout.");
 
         var textArgument = new Argument<string>("Text", "Text to encode");
         var eccOption = OptionsFactory.CreateEccOption();
