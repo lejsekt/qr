@@ -15,7 +15,7 @@ public static class OptionsFactory
     public static Option<int> CreateBorderOption()
     {
         var option = new Option<int>("--border", "Border thickness around QR code");
-        option.AddAlias("-m");
+        option.AddAlias("-b");
         option.SetDefaultValue(4);
         return option;
     }
