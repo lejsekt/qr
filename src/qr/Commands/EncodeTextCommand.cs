@@ -10,7 +10,7 @@ public static class EncodeTextCommand
 {
     public static Command Create()
     {
-        var rootCommand = new Command("text", "Encode text to QR code. SVG output will be printed to stdout.");
+        var command = new Command("text", "Encode text to QR code. SVG output will be printed to stdout.");
 
         var textArgument = new Argument<string>("Text", "Text to encode");
         var eccOption = OptionsFactory.CreateEccOption();
@@ -18,12 +18,12 @@ public static class EncodeTextCommand
         var outputPathOption = OptionsFactory.CreateOutputPathOption();
         var outputFormatOption = OptionsFactory.CreateOutputFormatOption();
 
-        rootCommand.AddArgument(textArgument);
-        rootCommand.AddOption(eccOption);
-        rootCommand.AddOption(borderOption);
-        rootCommand.AddOption(outputPathOption);
-        rootCommand.AddOption(outputFormatOption);
-        rootCommand.SetHandler((text, eccMode, border, outputPath, outputFormat, ctx) =>
+        command.AddArgument(textArgument);
+        command.AddOption(eccOption);
+        command.AddOption(borderOption);
+        command.AddOption(outputPathOption);
+        command.AddOption(outputFormatOption);
+        command.SetHandler((text, eccMode, border, outputPath, outputFormat, ctx) =>
             {
                 try
                 {
@@ -65,6 +65,6 @@ public static class EncodeTextCommand
                 }
             }, textArgument, eccOption, borderOption, outputPathOption, outputFormatOption,
             Bind.FromServiceProvider<InvocationContext>());
-        return rootCommand;
+        return command;
     }
 }
