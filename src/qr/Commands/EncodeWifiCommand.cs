@@ -2,6 +2,7 @@ using System.CommandLine;
 using System.CommandLine.Invocation;
 using Net.Codecrete.QrCodeGenerator;
 using qr.Shared;
+using Spectre.Console;
 
 namespace qr.Commands;
 
@@ -62,7 +63,7 @@ public static class EncodeWifiCommand
                         }
                         else
                         {
-                            throw new ArgumentException("Cannot read WIFI password from stdin");
+                            password = AnsiConsole.Prompt(new TextPrompt<string>("Enter WiFi password:").Secret('*'));
                         }
 
                         encryptionPasswordSegment = $"T:{encryption};P:{password};";
