@@ -3,9 +3,7 @@ using System.CommandLine.Invocation;
 using Net.Codecrete.QrCodeGenerator;
 using qr.Application;
 using qr.Shared;
-using SixLabors.ImageSharp;
 using Spectre.Console;
-using Color = SixLabors.ImageSharp.Color;
 
 namespace qr.Commands;
 
@@ -13,7 +11,7 @@ public static class EncodeWifiCommand
 {
     public static Command Create()
     {
-        var command = new Command("wifi", "Encode WiFi information to QR code. SVG output will be printed to stdout.");
+        var command = new Command("wifi", "Create QR code with WIFI login information");
 
         var ssidArgument = new Argument<string>("SSID (WiFi name)");
 
