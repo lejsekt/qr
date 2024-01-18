@@ -38,6 +38,13 @@ public static class EncodeWifiCommand
 
         command.SetHandler((ssid, encryptionType, isHidden, eccMode, border, outputPath, outputFormat, ctx) =>
             {
+                if (!ctx.Console.IsInputRedirected && ctx.Console.IsOutputRedirected)
+                {
+                    ctx.Console.WriteLine("If stdout is redirected, stdin has to be redirected as well to be able to read the password from it");
+                    ctx.ExitCode = 1;
+                    return;
+                }
+
                 try
                 {
                     var encryption = encryptionType switch
