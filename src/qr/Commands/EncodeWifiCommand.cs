@@ -24,14 +24,16 @@ public static class EncodeWifiCommand
 
         var eccOption = OptionsFactory.CreateEccOption();
         var borderOption = OptionsFactory.CreateBorderOption();
+        var outputPathOption = OptionsFactory.CreateOutputPathOption();
 
         command.AddArgument(ssidArgument);
         command.AddOption(encryptionTypeOption);
         command.AddOption(hiddenOption);
         command.AddOption(eccOption);
         command.AddOption(borderOption);
+        command.AddOption(outputPathOption);
 
-        command.SetHandler((ssid, encryptionType, isHidden, eccMode, border, ctx) =>
+        command.SetHandler((ssid, encryptionType, isHidden, eccMode, border, outputPath, ctx) =>
             {
                 try
                 {
@@ -76,20 +78,26 @@ public static class EncodeWifiCommand
                     var ecc = EccMapper.From(eccMode);
                     var qr = QrCode.EncodeText(text, ecc);
                     var svg = qr.ToSvgString(border);
-                    ctx.Console.WriteLine(svg);
+                    if (string.IsNullOrEmpty(outputPath))
+                    {
+                        ctx.Console.WriteLine(svg);
+                    }
+                    else
+                    {
+                        File.WriteAllText(outputPath, svg);
+                    }
                 }
                 catch (Exception ex)
                 {
                     ctx.Console.WriteLine($"Failed to create QR code: {ex.Message}");
                     ctx.ExitCode = 1;
                 }
-
-            }, ssidArgument, encryptionTypeOption, hiddenOption, eccOption, borderOption,
+            }, ssidArgument, encryptionTypeOption, hiddenOption, eccOption, borderOption, outputPathOption,
             Bind.FromServiceProvider<InvocationContext>());
 
         return command;
     }
-    
+
     internal enum EncryptionType
     {
         Wep,

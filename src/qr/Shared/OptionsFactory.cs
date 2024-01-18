@@ -20,5 +20,11 @@ public static class OptionsFactory
         return option;
     }
 
-
+    public static Option<string> CreateOutputPathOption()
+    {
+        var option = new Option<string>("--output", "Output path. Standard output used if left empty");
+        option.AddAlias("-o");
+        option.SetDefaultValue(string.Empty);
+        return option;
+    }
 }
