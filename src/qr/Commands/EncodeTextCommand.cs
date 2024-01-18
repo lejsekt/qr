@@ -1,8 +1,8 @@
 using System.CommandLine;
 using System.CommandLine.Invocation;
 using Net.Codecrete.QrCodeGenerator;
+using qr.Application;
 using qr.Shared;
-using SixLabors.ImageSharp;
 
 namespace qr.Commands;
 
@@ -29,34 +29,12 @@ public static class EncodeTextCommand
                 {
                     var ecc = EccMapper.From(eccMode);
                     var qr = QrCode.EncodeText(text, ecc);
+                    var saver = new QrCodeSaver();
+                    using var stream = string.IsNullOrWhiteSpace(outputPath)
+                        ? Console.OpenStandardOutput()
+                        : File.OpenWrite(outputPath);
 
-                    if (outputFormat == OutputFormat.Svg)
-                    {
-                        var svg = qr.ToSvgString(border);
-
-                        if (string.IsNullOrEmpty(outputPath))
-                        {
-                            ctx.Console.WriteLine(svg);
-                        }
-                        else
-                        {
-                            File.WriteAllText(outputPath, svg);
-                        }
-                    }
-                    else if (outputFormat == OutputFormat.Png)
-                    {
-                        using var image = qr.ToImage(1, border, Color.Black, Color.White);
-
-                        if (string.IsNullOrEmpty(outputPath))
-                        {
-                            using var stream = Console.OpenStandardOutput();
-                            image.SaveAsPng(stream);
-                        }
-                        else
-                        {
-                            image.SaveAsPng(outputPath);
-                        }
-                    }
+                    saver.Save(qr, outputFormat, border, stream);
                 }
                 catch (Exception ex)
                 {
