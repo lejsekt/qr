@@ -2,7 +2,9 @@ using System.CommandLine;
 using System.CommandLine.Invocation;
 using Net.Codecrete.QrCodeGenerator;
 using qr.Shared;
+using SixLabors.ImageSharp;
 using Spectre.Console;
+using Color = SixLabors.ImageSharp.Color;
 
 namespace qr.Commands;
 
@@ -25,6 +27,7 @@ public static class EncodeWifiCommand
         var eccOption = OptionsFactory.CreateEccOption();
         var borderOption = OptionsFactory.CreateBorderOption();
         var outputPathOption = OptionsFactory.CreateOutputPathOption();
+        var outputFormatOption = OptionsFactory.CreateOutputFormatOption();
 
         command.AddArgument(ssidArgument);
         command.AddOption(encryptionTypeOption);
@@ -32,8 +35,9 @@ public static class EncodeWifiCommand
         command.AddOption(eccOption);
         command.AddOption(borderOption);
         command.AddOption(outputPathOption);
+        command.AddOption(outputFormatOption);
 
-        command.SetHandler((ssid, encryptionType, isHidden, eccMode, border, outputPath, ctx) =>
+        command.SetHandler((ssid, encryptionType, isHidden, eccMode, border, outputPath, outputFormat, ctx) =>
             {
                 try
                 {
@@ -78,13 +82,31 @@ public static class EncodeWifiCommand
                     var ecc = EccMapper.From(eccMode);
                     var qr = QrCode.EncodeText(text, ecc);
                     var svg = qr.ToSvgString(border);
-                    if (string.IsNullOrEmpty(outputPath))
+
+                    if (outputFormat == OutputFormat.Svg)
                     {
-                        ctx.Console.WriteLine(svg);
+                        if (string.IsNullOrEmpty(outputPath))
+                        {
+                            ctx.Console.WriteLine(svg);
+                        }
+                        else
+                        {
+                            File.WriteAllText(outputPath, svg);
+                        }
                     }
-                    else
+                    else if (outputFormat == OutputFormat.Png)
                     {
-                        File.WriteAllText(outputPath, svg);
+                        using var image = qr.ToImage(1, border, Color.Black, Color.White);
+
+                        if (string.IsNullOrEmpty(outputPath))
+                        {
+                            using var stream = Console.OpenStandardOutput();
+                            image.SaveAsPng(stream);
+                        }
+                        else
+                        {
+                            image.SaveAsPng(outputPath);
+                        }
                     }
                 }
                 catch (Exception ex)
@@ -92,7 +114,7 @@ public static class EncodeWifiCommand
                     ctx.Console.WriteLine($"Failed to create QR code: {ex.Message}");
                     ctx.ExitCode = 1;
                 }
-            }, ssidArgument, encryptionTypeOption, hiddenOption, eccOption, borderOption, outputPathOption,
+            }, ssidArgument, encryptionTypeOption, hiddenOption, eccOption, borderOption, outputPathOption, outputFormatOption,
             Bind.FromServiceProvider<InvocationContext>());
 
         return command;

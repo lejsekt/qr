@@ -27,4 +27,12 @@ public static class OptionsFactory
         option.SetDefaultValue(string.Empty);
         return option;
     }
+
+    public static Option<OutputFormat> CreateOutputFormatOption()
+    {
+        var option = new Option<OutputFormat>("--format", "QR code format");
+        option.AddAlias("-f");
+        option.SetDefaultValue(OutputFormat.Svg);
+        return option;
+    }
 }
